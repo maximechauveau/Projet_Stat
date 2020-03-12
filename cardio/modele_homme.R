@@ -1,8 +1,10 @@
-library(dplyr)
-library(tidyr)
-library(tidyverse)
-library(caTools)
-library(ROCR)
+install.packages('pacman')
+
+pacman::p_load(dplyr)
+pacman::p_load(tidyr)
+pacman::p_load(tidyverse)
+pacman::p_load(caTools)
+pacman::p_load(ROCR)
 
 
 ###################
