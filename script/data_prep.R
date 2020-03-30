@@ -1,6 +1,6 @@
-##################################################################################
-# 1 - Importation des packages
-##################################################################################
+####################################
+### 1 - Importation des packages ###
+####################################
 
 install.packages('pacman')
 
@@ -21,13 +21,14 @@ pacman::p_load('questionr')
 pacman::p_load('caTools')
 
 
-##################################################################################
-# 2 - Import des données & Préparation
-##################################################################################
+############################################
+### 2 - Import des données & Préparation ###
+############################################
 
 # Renommage des colonnes
 
 df_heart <- read.csv("./data/framingham.csv")
+# 4238 lignes
 
 df_heart <- df_heart %>% rename(Sexe = male, Fumeur = currentSmoker, NbCigarrete_Jour = cigsPerDay, MedPA = BPMeds, AVC = prevalentStroke,
                                   Hypertension = prevalentHyp, TauxChol = totChol, sysTA = sysBP, diaTA = diaBP, IMC = BMI, BPM = heartRate,
@@ -40,6 +41,7 @@ summary(df_heart)
 ## On enlève les valeurs nulles
 
 df_heart <- df_heart %>% drop_na()
+#3656 lignes
 
 # Modification 0 = Homme // 1 = Femme
 
@@ -50,13 +52,9 @@ df_heart$Sexe[df_heart$Sexe=='1'] <- 'Femme'
 
 # Modification 0 = Pas malade // 1 = Malade
 
-df_heart$Sexe <- as.character(df_heart$Sexe)
-
 df_heart$estMalade10[df_heart$estMalade10=='0'] <- 'Pas malade'
 df_heart$estMalade10[df_heart$estMalade10=='1'] <- 'Malade'
 
-
-# 
 
 # on echantillone
 dfmalade <- df_heart %>% filter(estMalade10 == 'Malade')
@@ -70,6 +68,15 @@ split = sample.split(df$estMalade10, SplitRatio = 0.6666666666)
 
 dfApprentissage = subset(df, split==TRUE)
 dftest = subset(df, split==FALSE)
+
+#######################
+### 3 - Sauvegarde  ###
+#######################
+
+save(df_heart,
+     dfApprentissage,
+     dftest,
+     file = 'data/dataClean.RData')
 
 
 

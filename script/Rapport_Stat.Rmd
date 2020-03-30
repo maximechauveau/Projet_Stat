@@ -1,0 +1,54 @@
+---
+date: "28/03/2020"
+output: html_document
+---
+
+<div>
+<img src="https://media.licdn.com/dms/image/C560BAQHUCPLKiBDG3w/company-logo_200_200/0?e=2159024400&v=beta&t=oyn1hcdUk9NXqcdZgb_kIhABmIAiniK5pE4onmVdhFM" width=18%" align="left"/>
+
+<img src="https://www.businessdecision.fr/uploads/Image/b8/IMF_ACCROCHE/GAB_BDFRANCE/8178_919_Keyviz-carre.jpg" width=20% align="right" />
+</div>
+<br /><br />
+\n<br />
+\n<br />
+\n<br />
+\n<br />
+\n<br />
+\n<br />
+\n<br />
+\n<br />
+\n<br />
+\n<br />
+\n<br />
+<div>
+<center> <h1>Master2 MEDAS - USID17 - Statistiques - Faits stylisés du hasard</h1> </center>
+</div>
+
+\n<br />
+\n<br />
+
+<div align="center">
+<img src="https://mrmint.fr/wp-content/uploads/2017/09/logistic-regression-model.png" width=50%/>
+</div>
+
+\n<br />
+\n<br />
+
+<center>**Groupe :** É.Guilmin & M.Chauveau </center>
+
+\n<br />
+\n<br />
+
+<center>**Jury :** Erwan Josse </center>
+
+<center>**Responsable Pédagogique :** X.Aimé  </center>
+
+\n<br />
+\n<br />
+
+<center>**Établissement :** Cnam - Pays de la Loire - Nantes </center>
+
+<center>**Formation :** Master Mégadonnées et Analyse Sociale </center>
+
+\n<br />
+\n<br />
