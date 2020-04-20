@@ -52,3 +52,480 @@ output: html_document
 
 \n<br />
 \n<br />
+
+```{r setup, include=FALSE}
+install.packages('pacman')
+
+pacman::p_load('tidyr')
+pacman::p_load('dplyr')
+
+#ggplot pour les représentations graphiques
+pacman::p_load('ggplot2')
+pacman::p_load('plotly')
+
+# MASS pour la fonction stepAIC
+pacman::p_load('MASS')
+
+#
+pacman::p_load('questionr')
+
+# pour fonction sample.split
+pacman::p_load('caTools')
+
+pacman::p_load('knitr')
+
+#Matrice de corrélation
+pacman::p_load('corrplot')
+
+#Représentation graphique du modèle
+pacman::p_load('forestmodel')
+
+#Représentation graphique des effets
+pacman::p_load('labelled')
+pacman::p_load('ggeffects')
+pacman::p_load('cowplot')
+pacman::p_load('effects')
+```
+
+
+```{r chargement des données}
+load(file="C:/Users/maxim/Documents/Projet_Stat/data/dataClean.RData")
+```
+
+
+\n<br />
+\n<br />
+
+<center> <h1>Présentation du sujet</h1> </center>
+
+\n<br />
+\n<br />
+
+
+Pour ce projet, nous avons choisi le sujet suivant : Prédiciton des maladies cardiaques.
+
+https://www.kaggle.com/dileep070/heart-disease-prediction-using-logistic-regression
+
+Pour ce faire, nous avons préalablement préparé nos données, le scritp est disponible ici : ./script/data_prep.R
+
+Ici nous verrons notre méthodologie de travail. 
+
+
+<center> <h1>Statistique bivarivée</h1> </center>
+
+Afin de mieux comprendre notre base de données, nous avons décidé de faire une étude descriptive.
+
+
+```{r}
+freq(df_heart$estMalade10)
+```
+
+Notre base comporte 3656 patients, dans laquelle 15 % des patients ont eu une maladie cardiovasculaire dans les 10 années suivants les prises de mesures. Ces données proviennt de la ville de Framingham dans le Massachusetts, aux États-Unis.
+
+```{r Analyse par BPM}
+
+fig <- plot_ly(alpha = 0.6)
+fig <- fig %>% add_histogram(x = df_heart$BPM[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$BPM[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% layout(barmode = "overlay")
+
+fig
+```
+
+
+```{r Analyse par Sexe}
+
+fig <- plot_ly(alpha = 0.6)
+fig <- fig %>% add_histogram(x = df_heart$Sexe[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$Sexe[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% layout(barmode = "overlay")
+
+fig
+```
+
+
+```{r Analyse par Education}
+
+fig <- plot_ly(alpha = 0.6)
+fig <- fig %>% add_histogram(x = df_heart$education[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$education[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% layout(barmode = "overlay")
+
+fig
+```
+
+
+```{r Analyse par Fumeur à remplacer par un camembert}
+
+fig <- plot_ly(alpha = 0.6)
+fig <- fig %>% add_histogram(x = df_heart$Fumeur[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$Fumeur[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% layout(barmode = "overlay")
+
+fig
+```
+
+
+```{r Analyse par NbCigarrette_Jour faire des classes}
+
+fig <- plot_ly(alpha = 0.6)
+fig <- fig %>% add_histogram(x = df_heart$NbCigarrete_Jour[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$NbCigarrete_Jour[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% layout(barmode = "overlay")
+
+fig
+```
+
+
+```{r Analyse par MedPA}
+fig <- plot_ly(alpha = 0.6)
+fig <- fig %>% add_histogram(x = df_heart$MedPA[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$MedPA[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% layout(barmode = "overlay")
+
+fig
+```
+
+
+```{r Analyse par AVC}
+fig <- plot_ly(alpha = 0.6)
+fig <- fig %>% add_histogram(x = df_heart$AVC[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$AVC[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% layout(barmode = "overlay")
+
+fig
+```
+
+
+```{r Analyse par Hypertension}
+fig <- plot_ly(alpha = 0.6)
+fig <- fig %>% add_histogram(x = df_heart$Hypertension[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$Hypertension[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% layout(barmode = "overlay")
+
+fig
+```
+
+
+```{r Analyse par diabetes}
+fig <- plot_ly(alpha = 0.6)
+fig <- fig %>% add_histogram(x = df_heart$diabetes[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$diabetes[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% layout(barmode = "overlay")
+
+fig
+```
+
+
+```{r Analyse par TauxChol}
+fig <- plot_ly(alpha = 0.6)
+fig <- fig %>% add_histogram(x = df_heart$TauxChol[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$TauxChol[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% layout(barmode = "overlay")
+
+fig
+```
+
+
+```{r Analyse par sysTA}
+fig <- plot_ly(alpha = 0.6)
+fig <- fig %>% add_histogram(x = df_heart$sysTA[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$sysTA[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% layout(barmode = "overlay")
+
+fig
+```
+
+
+
+```{r Analyse par diaTA}
+fig <- plot_ly(alpha = 0.6)
+fig <- fig %>% add_histogram(x = df_heart$diaTA[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$diaTA[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% layout(barmode = "overlay")
+
+fig
+```
+
+
+```{r Analyse par IMC}
+fig <- plot_ly(alpha = 0.6)
+fig <- fig %>% add_histogram(x = df_heart$IMC[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$IMC[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% layout(barmode = "overlay")
+
+fig
+```
+
+
+```{r Analyse par BPM}
+fig <- plot_ly(alpha = 0.6)
+fig <- fig %>% add_histogram(x = df_heart$BPM[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$BPM[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% layout(barmode = "overlay")
+
+fig
+```
+
+
+```{r Analyse par glucose}
+fig <- plot_ly(alpha = 0.6)
+fig <- fig %>% add_histogram(x = df_heart$glucose[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$glucose[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% layout(barmode = "overlay")
+
+fig
+```
+
+
+<center> <h1>Matrice de corrélation</h1> </center>
+
+```{r}
+mcor <- cor(df_heart)
+mcor
+corrplot(mcor, type="upper", order="hclust", tl.col="black", tl.srt=45)
+```
+
+Les variables Fumeur et nbcigarrete_Jour sont très correlées : 0.77
+diabetes glucose : 0.61
+sysTA et diaTA : 0.79
+Hypertention et sysTA : 0.70
+Hypertension et diaTA : 0.62
+
+
+<center> <h1>Régression logistique</h1> </center>
+
+
+L'objectif de la régression logistique est de modéliser, de classifier, une variable binaire prenant ses valeurs dans {0,1} en fonction de variables explicatives quantitatives (et potentiellement qualitatives). La régression logistique est une méthode de classification (supervisée) qui permet de traiter des cas comme :
+
+  - la prévision de présence/absence d'une maladie ;
+
+  - la prévision de l'état de fonctionnement d'une machine-outil en fonction de ses caractéristiques (ancienneté, modèle, etc.), à des fins de maintenance prédictive ;
+
+  - le credit scoring (attribution ou non d'un crédit).
+
+
+Pour commencer nous allons faire une régression directement sur notre base de données.
+
+```{r}
+model_sature <- glm(estMalade10~. , data = df_heart, family = binomial)
+summary(model_sature)
+```
+
+
+La première analyse que nous pouvons avec cette régression est que certaines des variables obtenues ont des p-valeurs qui sont inférieures au niveau de test de 5 %, ce qui nous indique qu'elles sont bien significatives. Certaines autres ne sont pas en dessous de ce seuil. Nous pouvons en lister 6.
+
+On peut donc passer sur une procédure de sélection en retirant les variables non significatives au fur et à mesure, mais nous pouvons aussi sélectionner automatiquement un modèle avec une commande telle que stepAIC  , qui sélectionne de manière automatique un modèle en se basant sur le critère AIC.
+
+
+```{r}
+stepAIC(model_sature)
+```
+
+
+```{r}
+var_label(df_heart$estMalade10) <- "Maladie dans les 10 Ans ?"
+var_label(df_heart$Sexe) <- "Sexe"
+var_label(df_heart$NbCigarrete_Jour) <- "Nombre de cigarette par jour"
+var_label(df_heart$AVC) <- "AVC"
+var_label(df_heart$Hypertension) <- "Hypertension"
+var_label(df_heart$TauxChol) <- "Taux de Cholesterol"
+var_label(df_heart$glucose) <- "Taux de glucose"
+```
+
+
+La fonction stepAIC nous donne le meilleur modèle qui est le suivant :
+
+```{r}
+modele_retenu <- glm(formula = estMalade10 ~ Sexe + age + NbCigarrete_Jour + AVC + 
+    Hypertension + TauxChol + sysTA + glucose, family = binomial, 
+    data = df_heart)
+print(modele_retenu)
+```
+
+
+Tout d'abord, nous pouvons observer que la fonction stepAIC a sélectionné 8 variables.
+Sexe
+age
+NbCigarrete_Jour
+AVC
+Hypertension
+TauxChol
+sysTA
+glucose
+
+
+Avec ce modèle nous avons un AIC de 2775. Pour rappel, l'AIC est le critère d'information d'Akaike, (en anglais Akaike information criterion ou AIC). C'est une mesure de la qualité d'un modèle statistique proposée par Hirotugu Akaike en 1973.
+
+Lorsque l'on estime un modèle statistique, il est possible d'augmenter la vraisemblance du modèle en ajoutant un paramètre. Le critère d'information d'Akaike, tout comme le critère d'information bayésien, permet de pénaliser les modèles en fonction du nombre de paramètres afin de satisfaire le critère de parcimonie. On choisit alors le modèle avec le critère d'information d'Akaike le plus faible.
+
+
+Interprétation
+
+Nous avons donc un AIC de 2775.
+Une déviance de  2757.
+
+Elle compare la vraisemblance obtenue à celle d’un modèle de référence : le modèle complet (ou modèle saturé).
+
+```{r}
+exp(cbind(coef(modele_retenu), confint(modele_retenu)))
+```
+
+
+```{r}
+forest_model(modele_retenu)
+```
+
+
+```{r}
+cowplot::plot_grid(plotlist = plot(ggeffect(modele_retenu)))
+```
+
+```{r}
+plot(ggeffect(modele_retenu, "Sexe"))
+```
+
+
+```{r}
+plot(ggeffect(modele_retenu, "age"))
+```
+
+```{r}
+plot(ggeffect(modele_retenu, "NbCigarrete_Jour"))
+```
+
+```{r}
+plot(ggeffect(modele_retenu, "AVC"))
+```
+
+```{r}
+plot(ggeffect(modele_retenu, "Hypertension"))
+```
+
+```{r}
+plot(ggeffect(modele_retenu, "TauxChol"))
+```
+
+```{r}
+plot(ggeffect(modele_retenu, "sysTA"))
+```
+
+```{r}
+plot(ggeffect(modele_retenu, "glucose"))
+```
+Cela nous a permis d'avoir un point de départ.
+
+Pour la suite de notre travail, nous avons choisi de prendre parti sur l'hypothèse suivante :
+
+  - L'objectif de notre projet est la détection de malades, étant donné que le nombre de malade est relativement petit 557 individus (15% pour de notre base), nous avons décidé de travailler sur une base d'apprentissage ayant 50% d'individus malade. Ainsi nos modèles seront meilleurs pour la détection de malade.
+
+Les résultats suivants seront donc présentés avec les conditions énoncées précédemment.
+
+```{r}
+model_sature_Appren <- glm(estMalade10~. , data = dfApprentissage, family = binomial)
+summary(model_sature_Appren)
+```
+
+
+
+```{r}
+stepAIC(model_sature_Appren)
+```
+
+
+
+```{r}
+modele_Appren <- glm(formula = estMalade10 ~ Sexe + age + education + NbCigarrete_Jour + sysTA, family = binomial, data = dfApprentissage)
+
+modele_Appren
+```
+
+
+Nous pouvons observer que la fonction stepAIC a sélectionné 5 variables.
+Sexe
+age
+education
+NbCigarrete_Jour
+sysTA
+
+```{r}
+modele_Appren$aic
+modele_Appren$deviance
+```
+
+
+Nous avons un bien meilleur AIC, 871.2 et une déviance de 859.
+
+Passons maintenant à une analyse plus appronfondie.
+
+
+
+<center> <h1>Matrice de confusion</h1> </center>
+
+
+Une manière de tester la qualité d’un modèle est le calcul d’une matrice de confusion, c’est-à-dire le tableau croisé des valeurs observées et celles des valeurs prédites en appliquant le modèle aux données d’origine.
+
+La méthode predict avec l’argument type="response" permet d’appliquer notre modèle logistique à un tableau de données et renvoie pour chaque individu la probabilité qu’il ait vécu le phénomène étudié.
+
+
+
+```{r Matrice de confusion}
+malade_pred <- predict(modele_Appren, newdata = dfApprentissage, type = "response")
+table(malade_pred > 0.5 , dfApprentissage$estMalade10)
+
+pourcentage <- table(malade_pred > 0.5 , dfApprentissage$estMalade10)
+
+#Calcul pour le pourcentage
+pourcentage <- as.data.frame(pourcentage)
+round((pourcentage$Freq[1]+pourcentage$Freq[4])/sum(pourcentage$Freq),4)
+```
+
+```{r}
+appren.p <- cbind(dfApprentissage, predict(modele_retenu, newdata = dfApprentissage,
+                                           type = "response")
+                  )
+appren.p <- within(appren.p, {
+  PredictedWin <- plogis(fit)
+  LL <- plogis(fit - (1.96 * se.fit))
+  UL <- plogis(fit + (1.96 * se.fit))
+})
+appren.p <- cbind(appren.p, pred.chd = factor(ifelse(appren.p$PredictedWin > 0.5, 1, 0)))
+pourcentage <- (m.confusion <- as.matrix(table(appren.p$pred.chd, appren.p$estMalade10)))
+pourcentage
+```
+
+
+
+
+#Calcul pourcentage
+pourcentage <- as.data.frame(pourcentage)
+round((pourcentage$Freq[1]+pourcentage$Freq[4])/sum(pourcentage$Freq),4)
+
+
+# Courbe ROC
+# install.packages("ROCR")
+
+pred <- prediction(appren.p$PredictedWin, appren.p$estMalade10)
+perf <- performance(pred, "tpr", "fpr")
+plot(perf)
+
+# Analyse des rÃ©sidus
+res_dev <- residuals(modele.retenu) #residus de deviance
+res_pear <- residuals(modele.retenu,type="pearson") #residus de Pearson
+res_dev_stand <- rstandard(modele.retenu) #residu de deviance standardises
+H <- influence(modele.retenu)$hat #diagonale de la hat matrix
+res_pear_stand <- res_pear/sqrt(1-H) #residu de Pearson standardises
+plot(rstudent(modele.retenu),type="p",cex=0.5,ylab="Residus studentises par VC")
+abline(h=c(-2,2))
+
+# Prévision
+plot(predict(modele.retenu),rstudent(modele.retenu),type="p",cex=0.5,xlab="prévision linéaire",
+     ylab="Résidus studentisés par VC")
+
+# Distance de cook
+plot(cooks.distance(modele.retenu),type="h",ylab="Distance de Cook")
+
+
+
+
+

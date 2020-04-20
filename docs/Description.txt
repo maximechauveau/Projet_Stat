@@ -1,0 +1,86 @@
+RÉGRESSION LOGISTIQUE - PRÉDICTION DES MALADIES CARDIAQUES
+
+Introduction
+L'Organisation mondiale de la santé estime à 12 millions le nombre de décès dus aux maladies cardiaques dans le monde chaque année.
+La moitié des décès aux États-Unis et dans d'autres pays développés sont dus à des maladies cardio-vasculaires.
+Le pronostic précoce des maladies cardio-vasculaires peut aider à prendre des décisions sur les changements de mode de vie
+chez les patients à haut risque et, par conséquent, à réduire les complications.
+Cette recherche vise à identifier les facteurs les plus pertinents/risques de maladies cardiaques ainsi qu'à prédire le risque global en
+utilisant la régression logistique
+
+
+Préparation des données
+
+Source :
+L'ensemble de données est accessible au public sur le site web de Kaggle, et il provient d'une étude cardiovasculaire en cours sur les habitants
+de la ville de Framingham, dans le Massachusetts. L'objectif de la classification est de prédire si le patient présente un risque
+de maladie coronarienne (CHD) sur 10 ans et de fournir des informations sur les patients. Il comprend plus de 4 000 enregistrements et 15 attributs.
+
+Variables
+Chaque attribut est un facteur de risque potentiel. Il existe des facteurs de risque à la fois démographiques, comportementaux et médicaux.
+
+Démographiques :
+- Sexe : homme ou femme(Nominal)
+- L'âge : Âge du patient ;(Continu - Bien que les âges enregistrés aient été tronqués en nombres entiers, la notion d'âge est continue)
+
+Comportemental
+- Fumeur actuel : si le patient est un fumeur actuel ou non (Nominal)
+- Cigares par jour : le nombre de cigarettes que la personne a fumé en moyenne en un jour
+(peut être considéré comme continu car on peut avoir n'importe quel nombre de cigarettes, même une demi-cigarette).
+
+Médical( historique)
+- Médicaments pour la tension artérielle : si le patient prenait ou non des médicaments pour la tension artérielle (Nominal)
+- Accident vasculaire cérébral fréquent : si le patient a déjà eu un accident vasculaire cérébral ou non (Nominal)
+- Hyp prévalente : si le patient était ou non hypertendu (Nominal)
+- Diabète : si le patient était ou non diabétique (Nominal)
+
+
+Médical(actuel)
+- Tot Chol : taux de cholestérol total (en continu)
+- Sys BP : tension artérielle systolique (continue)
+- Dia BP : tension artérielle diastolique (en continu)
+- BMI : Indice de masse corporelle (continu)
+- Fréquence cardiaque : rythme cardiaque
+(Continu - Dans la recherche médicale, des variables telles que la fréquence cardiaque, bien que discrètes en fait,
+sont considérées comme continues en raison du grand nombre de valeurs possibles).
+- Glucose : taux de glucose (Continu)
+
+
+Variable prédictive (objectif souhaité)
+- Risque de coronaropathie sur 10 ans (binaire : "1", signifie "Oui", "0" signifie "Non")
+
+Régression logistique
+La régression logistique est un type d'analyse de régression dans les statistiques utilisées pour prédire le résultat d'une variable catégorielle
+dépendante à partir d'un ensemble de variables prédictives ou indépendantes. Dans la régression logistique, la variable dépendante est toujours binaire.
+La régression logistique est principalement utilisée pour la prédiction et le calcul de la probabilité de succès.
+Les résultats ci-dessus montrent que certains des attributs ont une valeur P supérieure à l'alpha préféré (5 %)
+et présentent donc une faible relation statistiquement significative avec la probabilité de maladie cardiaque.
+L'approche d'élimination à rebours est utilisée ici pour éliminer les attributs ayant la valeur P la plus élevée, un à la fois,
+puis pour exécuter la régression de manière répétée jusqu'à ce que tous les attributs aient une valeur P inférieure à 0,05.
+
+Sélection des caractéristiques : Élimination à rebours (approche de la valeur P)
+Équation de régression logistique
+P=eβ0+β1X1/1+eβ0+β1X1P=eβ0+β1X1/1+eβ0+β1X1
+
+Lorsque toutes les fonctions sont branchées :
+logit(p)=log(p/(1-p))=β0+β1∗Sexmale+β2∗age+β3∗cigsPerDay+β4∗totChol+β5∗sysBP+β6∗glucoselogit(p)=log(p/(1-p))=β0+β1∗Sexmale+β2∗age+β3∗cigsPerDay+β4∗totChol+β5∗sysBP+β6∗glucose
+
+Interpréter les résultats : Rapport de cotes, intervalles de confiance et valeurs P
+- Ce modèle ajusté montre que, toutes les autres caractéristiques étant constantes, la probabilité de recevoir un diagnostic de maladie cardiaque
+pour les hommes (sexe masculin = 1) par rapport aux femmes (sexe masculin = 0) est exp(0,5815) = 1,788687.
+En termes de variation en pourcentage, nous pouvons dire que les chances pour les hommes sont 78,8 % plus élevées que pour les femmes.
+- Le coefficient pour l'âge indique que, toutes choses étant égales par ailleurs, nous constaterons une augmentation de 7 % des chances d'être
+diagnostiqué avec une HCD pour une augmentation d'âge d'un an, puisque exp(0,0655) = 1,067644.
+- De même, chaque cigarette supplémentaire que l'on fume entraîne une augmentation de 2 % des chances d'être atteint de la maladie de Creutzfeldt-Jakob.
+- Pour le taux de cholestérol total et le taux de glucose, il n'y a pas de changement significatif.
+
+- Il y a une augmentation de 1,7 % des chances pour chaque unité d'augmentation de la pression artérielle systolique.
+
+Évaluation du modèle - Statistiques
+Il ressort clairement des statistiques ci-dessus que le modèle est plus spécifique que sensible.
+Les valeurs négatives sont prédites avec plus de précision que les valeurs positives.
+Les probabilités prédites sont de 0 (pas de maladie coronarienne) et de 1 (maladie coronarienne : oui)
+pour les données de test avec un seuil de classification par défaut de 0,5 abaisser le seuil
+Comme le modèle prédit les maladies cardiaques, il est déconseillé de faire trop d'erreurs de type II.
+Un faux négatif ( ignorant la probabilité de maladie alors qu'il y en a une) est plus dangereux qu'un faux positif dans ce cas.
+Par conséquent, afin d'augmenter la sensibilité, le seuil peut être

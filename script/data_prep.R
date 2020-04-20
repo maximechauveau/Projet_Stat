@@ -44,21 +44,84 @@ df_heart <- df_heart %>% drop_na()
 #3656 lignes
 
 # Modification 0 = Homme // 1 = Femme
-
 df_heart$Sexe <- as.character(df_heart$Sexe)
 
 df_heart$Sexe[df_heart$Sexe=='0'] <- 'Homme'
 df_heart$Sexe[df_heart$Sexe=='1'] <- 'Femme'
+df_heart$Sexe <- as.factor(df_heart$Sexe)
+
+levels(df_heart$Sexe)
+freq(df_heart$Sexe)
+
+#Fumeur
+df_heart$Fumeur[df_heart$Fumeur=='0'] <- 'Non Fumeur'
+df_heart$Fumeur[df_heart$Fumeur=='1'] <- 'Fumeur'
+df_heart$Fumeur <- as.factor(df_heart$Fumeur)
+df_heart$Fumeur <- relevel(df_heart$Fumeur, 'Non Fumeur')
+
+levels(df_heart$Fumeur)
+freq(df_heart$Fumeur)
+
+#MedPA
+df_heart$MedPA[df_heart$MedPA == '1'] <- 'Oui'
+df_heart$MedPA[df_heart$MedPA == '0'] <- 'Non'
+df_heart$MedPA <- as.factor(df_heart$MedPA)
+df_heart$MedPA <- relevel(df_heart$MedPA, 'Non')
+
+levels(df_heart$MedPA)
+freq(df_heart$MedPA)
+
+#AVC
+df_heart$AVC[df_heart$AVC=='1'] <- 'AVC'
+df_heart$AVC[df_heart$AVC=='0'] <- 'Pas AVC'
+df_heart$AVC <- as.factor(df_heart$AVC)
+df_heart$AVC <- relevel(df_heart$AVC, 'Pas AVC')
+
+levels(df_heart$AVC)
+freq(df_heart$AVC)
+
+#hypertension
+df_heart$Hypertension[df_heart$Hypertension=='0'] <- 'Non'
+df_heart$Hypertension[df_heart$Hypertension=='1'] <- 'Oui'
+df_heart$Hypertension <- as.factor(df_heart$Hypertension)
+df_heart$Hypertension <- relevel(df_heart$Hypertension, 'Non')
+
+levels(df_heart$Hypertension)
+freq(df_heart$Hypertension)
+
+#diabete
+df_heart$diabetes[df_heart$diabetes=='0'] <- 'Non'
+df_heart$diabetes[df_heart$diabetes=='1'] <- 'Oui'
+df_heart$diabetes <- as.factor(df_heart$diabetes)
+df_heart$diabetes <- relevel(df_heart$diabetes, 'Non')
+
+levels(df_heart$diabetes)
+freq(df_heart$diabetes)
 
 # Modification 0 = Pas malade // 1 = Malade
 
-df_heart$estMalade10[df_heart$estMalade10=='0'] <- 'Pas malade'
-df_heart$estMalade10[df_heart$estMalade10=='1'] <- 'Malade'
+#df_heart$estMalade10[df_heart$estMalade10=='0'] <- 'Pas malade'
+#df_heart$estMalade10[df_heart$estMalade10=='1'] <- 'Malade'
+df_heart$estMalade10 <- as.factor(df_heart$estMalade10)
+df_heart$estMalade10 <- relevel(df_heart$estMalade10, '0')
 
+levels(df_heart$estMalade10)
+freq(df_heart$estMalade10)
+
+#education
+df_heart$education[df_heart$education=='1'] <- 'Some High School'
+df_heart$education[df_heart$education=='2'] <- 'High School or GED'
+df_heart$education[df_heart$education=='3'] <- 'Some College or Vocational School'
+df_heart$education[df_heart$education=='4'] <- 'college'
+df_heart$education <- as.factor(df_heart$education)
+df_heart$education <- relevel(df_heart$education, 'Some High School')
+
+levels(df_heart$education)
+freq(df_heart$education)
 
 # on echantillone
-dfmalade <- df_heart %>% filter(estMalade10 == 'Malade')
-dfpasmalade <- df_heart %>% filter(estMalade10 == 'Pas malade')
+dfmalade <- df_heart %>% filter(estMalade10 == 1)
+dfpasmalade <- df_heart %>% filter(estMalade10 == 0)
 dfpasmalade2 <- dfpasmalade[sample(1:nrow(dfpasmalade),nrow(dfmalade)),]
 df <- rbind(dfmalade, dfpasmalade2)
 
@@ -124,8 +187,8 @@ table(df_heart$BPM_Cl)
 # Création d'une nouvelle variable BPM
 
 fig <- plot_ly(alpha = 0.6)
-fig <- fig %>% add_histogram(x = df$BPM[df$estMalade10=='Pas malade'], name = 'Pas malade')
-fig <- fig %>% add_histogram(x = df$BPM[df$estMalade10=='Malade'], name = 'Malade')
+fig <- fig %>% add_histogram(x = df_heart$BPM[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$BPM[df_heart$estMalade10 == 1], name = 'Malade')
 fig <- fig %>% layout(barmode = "overlay")
 
 fig
@@ -282,14 +345,16 @@ plot_ly(x = x0, type = "histogram", name = "Histogram", alpha = 0.6) %>%
 #  - Régression sans préparation  ###
 #####################################
 
+model_sature <- glm(estMalade10~. , data = dfApprentissage, family = binomial)
+summary(model_sature)
+
 model_sature <- glm(estMalade10~. , data = df_heart, family = binomial)
 summary(model_sature)
 
 step(model_sature)
 
-glm(formula = estMalade10 ~ Sexe + age + NbCigarrete_Jour + AVC + 
-      Hypertension + TauxChol + sysTA + glucose, family = binomial, 
-    data = df_heart)
+glm(formula = estMalade10 ~ Sexe + age + NbCigarrete_Jour + sysTA, 
+    family = binomial, data = dfApprentissage)
 
 
 stepAIC(model_sature)
@@ -298,32 +363,32 @@ glm(formula = estMalade10 ~ Sexe + age + NbCigarrete_Jour + AVC +
       Hypertension + TauxChol + sysTA + glucose, family = binomial, 
     data = df_heart)
 
-model_retenu <- glm(formula = estMalade10 ~ Sexe + age + NbCigarrete_Jour + AVC + 
-                      Hypertension + TauxChol + sysTA + glucose, family = binomial, 
-                    data = df_heart)
+model_retenu <- glm(formula = estMalade10 ~ Sexe + age + NbCigarrete_Jour + sysTA, 
+                    family = binomial, data = dfApprentissage)
 
 
 ###############
 # Interprétation
 summary(model_retenu)
 
-#
+# Avec base 50/50 : Deviance = 904.8674
 model_retenu$deviance
 
-#
+#Avec base 50/50 : AIC = 914
 model_retenu$aic
 
+model_retenu$
 #calcul de la vraisemblance
 prev <- model_retenu$fitted.values #on obtient les pi
-vrais <- rep(0,nrow(df_heart))
-vrais[df_heart$estMalade10=="Malade"] <- prev[df_heart$estMalade10=="Malade"]
-vrais[df_heart$estMalade10=="Pas malade"] <- 1-prev[df_heart$estMalade10=="Pas malade"]
+vrais <- rep(0,nrow(dfApprentissage))
+vrais[dfApprentissage$estMalade10== 1] <- prev[dfApprentissage$estMalade10== 1]
+vrais[dfApprentissage$estMalade10== 0] <- 1-prev[dfApprentissage$estMalade10== 0]
 vrais <- prod(vrais) #vrais est la vraisemblance du modele
-dev <- -2*log(vrais) 
+dev <- -2*log(vrais)
 dev
 
-# MAtrice de confusion
-appren.p <- cbind(df_heart, predict(model_retenu, newdata = df_heart, type = "link", 
+# Matrice de confusion
+appren.p <- cbind(dfApprentissage, predict(model_retenu, newdata = dfApprentissage, type = "link", 
                                    se = TRUE))
 appren.p <- within(appren.p, {
   PredictedWin <- plogis(fit)
@@ -336,7 +401,7 @@ appren.p <- cbind(appren.p, pred.chd = factor(ifelse(appren.p$PredictedWin > 0.9
 #Calcul pourcentage
 # 
 
-tableau <- table(df_heart$Sexe, df_heart$estMalade10)
+tableau <- table(dfApprentissage$Sexe, dfApprentissage$estMalade10)
 print(tableau)
 tableau <- addmargins(prop.table(addmargins(tableau,1),1),2)
 print(tableau)
@@ -348,17 +413,17 @@ pacman::p_load(blorr)
 blr_step_aic_both(model_retenu)
 step(model_retenu)
 
-blr_gains_table(model_retenu, data = df_heart) %>%
+blr_gains_table(model_retenu, data = dfApprentissage) %>%
   blr_roc_curve()
 
-blr_confusion_matrix(model_retenu, data = df_heart, cutoff = 0)
+blr_confusion_matrix(model_retenu, data = dfApprentissage, cutoff = 0)
 
 ?blr_confusion_matrix
 
 # Courbe ROC
 
 pacman::p_load(ROCR)
-pred <- prediction(appren.p$PredictedWin, appren.p$TenYearCHD)
+pred <- prediction(appren.p$PredictedWin, appren.p$estMalade10)
 perf <- performance(pred, "tpr", "fpr")
 plot(perf)
 
