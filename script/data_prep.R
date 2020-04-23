@@ -2,7 +2,7 @@
 ### 1 - Importation des packages ###
 ####################################
 
-install.packages('pacman')
+pacman::p_load('pacman')
 
 pacman::p_load('tidyr')
 pacman::p_load('dplyr')
@@ -43,15 +43,20 @@ summary(df_heart)
 df_heart <- df_heart %>% drop_na()
 #3656 lignes
 
+#Création de ma base pour la matrice de corrélation
+df_correlation <- df_heart
+
 # Modification 0 = Homme // 1 = Femme
 df_heart$Sexe <- as.character(df_heart$Sexe)
 
-df_heart$Sexe[df_heart$Sexe=='0'] <- 'Homme'
-df_heart$Sexe[df_heart$Sexe=='1'] <- 'Femme'
+df_heart$Sexe[df_heart$Sexe=='0'] <- 'Femme'
+df_heart$Sexe[df_heart$Sexe=='1'] <- 'Homme'
 df_heart$Sexe <- as.factor(df_heart$Sexe)
+df_heart$Sexe <- relevel(df_heart$Sexe, 'Femme')
 
 levels(df_heart$Sexe)
 freq(df_heart$Sexe)
+
 
 #Fumeur
 df_heart$Fumeur[df_heart$Fumeur=='0'] <- 'Non Fumeur'
@@ -120,27 +125,73 @@ levels(df_heart$education)
 freq(df_heart$education)
 
 # on echantillone
-dfmalade <- df_heart %>% filter(estMalade10 == 1)
-dfpasmalade <- df_heart %>% filter(estMalade10 == 0)
-dfpasmalade2 <- dfpasmalade[sample(1:nrow(dfpasmalade),nrow(dfmalade)),]
-df <- rbind(dfmalade, dfpasmalade2)
+#dfmalade <- df_heart %>% filter(estMalade10 == 1)
+#dfpasmalade <- df_heart %>% filter(estMalade10 == 0)
+#dfpasmalade2 <- dfpasmalade[sample(1:nrow(dfpasmalade),nrow(dfmalade)),]
+#df <- rbind(dfmalade, dfpasmalade2)
 
 #  on defini df d'aprentissage et df test
-set.seed(500)
-split = sample.split(df$estMalade10, SplitRatio = 0.6666666666)
+#set.seed(500)
+#split = sample.split(df$estMalade10, SplitRatio = 0.6666666666)
 
-dfApprentissage = subset(df, split==TRUE)
-dftest = subset(df, split==FALSE)
+#dfApprentissage = subset(df, split==TRUE)
+#dftest = subset(df, split==FALSE)
+
+
+#Séparation des tables train et test
+set.seed(123)
+
+df_heart1 <- df_heart
+df_heart1$spl <-  sample.split(df_heart1$estMalade10, SplitRatio=0.7)
+
+dfAppren = subset(df_heart1, split==TRUE)
+dfTest = subset(df_heart1, split==FALSE)
+
+dfAppren <- dfAppren[,-17]
+dfTest <- dfTest[,-17]
+
+# Modèle Homme et Femme
+df_Homme <- df_heart %>% filter(Sexe == 'Homme')
+df_Femme <- df_heart %>% filter(Sexe == 'Femme')
+
+df_Homme <- df_Homme[,-1]
+df_Femme <- df_Femme[,-1]
+
+
+#Séparation des tables train et test
+set.seed(145)
+
+df_Homme$spl <-  sample.split(df_Homme$estMalade10, SplitRatio=0.7)
+df_Femme$spl <-  sample.split(df_Femme$estMalade10, SplitRatio=0.7)
+
+#Homme
+dfApprenHomme = subset(df_Homme, split==TRUE)
+dfTestHomme = subset(df_Homme, split==FALSE)
+
+dfApprenHomme <- dfApprenHomme[,-16]
+dfTestHomme <- dfTestHomme[,-16]
+
+#Femme
+dfApprenFemme =  subset(df_Femme, split==TRUE)
+dfTestFemme = subset(df_Femme, split==FALSE)
+
+dfApprenFemme <- dfApprenFemme[,-16]
+dfTestFemme <- dfTestFemme[,-16]
+
 
 #######################
 ### 3 - Sauvegarde  ###
 #######################
 
 save(df_heart,
-     dfApprentissage,
-     dftest,
+     dfAppren,
+     dfTest,
+     df_correlation,
+     dfApprenHomme,
+     dfTestHomme,
+     dfApprenFemme,
+     dfTestFemme,
      file = 'data/dataClean.RData')
-
 
 
 

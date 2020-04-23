@@ -85,11 +85,17 @@ pacman::p_load('labelled')
 pacman::p_load('ggeffects')
 pacman::p_load('cowplot')
 pacman::p_load('effects')
+
+# Courbe ROC
+pacman::p_load('ROCR')
+
+#Distance de Cook
+pacman::p_load('car')
 ```
 
 
 ```{r chargement des données}
-load(file="C:/Users/maxim/Documents/Projet_Stat/data/dataClean.RData")
+load(file='C:/Users/mchauveau/Documents/Maxime Chauveau/Master Medas/Projet_Stat/data/dataClean.RData')
 ```
 
 
@@ -281,8 +287,7 @@ fig
 <center> <h1>Matrice de corrélation</h1> </center>
 
 ```{r}
-mcor <- cor(df_heart)
-mcor
+mcor <- cor(df_correlation)
 corrplot(mcor, type="upper", order="hclust", tl.col="black", tl.srt=45)
 ```
 
@@ -316,6 +321,9 @@ summary(model_sature)
 La première analyse que nous pouvons avec cette régression est que certaines des variables obtenues ont des p-valeurs qui sont inférieures au niveau de test de 5 %, ce qui nous indique qu'elles sont bien significatives. Certaines autres ne sont pas en dessous de ce seuil. Nous pouvons en lister 6.
 
 On peut donc passer sur une procédure de sélection en retirant les variables non significatives au fur et à mesure, mais nous pouvons aussi sélectionner automatiquement un modèle avec une commande telle que stepAIC  , qui sélectionne de manière automatique un modèle en se basant sur le critère AIC.
+
+
+Une alternative à la fonction stepAIC est la fonction step qui fonctionne de la même manière. Cependant cela ne change rien aux régressions logistiques classiques.
 
 
 ```{r}
@@ -378,8 +386,97 @@ forest_model(modele_retenu)
 
 
 ```{r}
-cowplot::plot_grid(plotlist = plot(ggeffect(modele_retenu)))
+plot(ggeffect(modele_retenu, "Sexe"))
 ```
+
+
+```{r}
+plot(ggeffect(modele_retenu, "age"))
+```
+
+```{r}
+plot(ggeffect(modele_retenu, "NbCigarrete_Jour"))
+```
+
+```{r}
+plot(ggeffect(modele_retenu, "AVC"))
+```
+
+```{r}
+plot(ggeffect(modele_retenu, "Hypertension"))
+```
+
+```{r}
+plot(ggeffect(modele_retenu, "TauxChol"))
+```
+
+```{r}
+plot(ggeffect(modele_retenu, "sysTA"))
+```
+
+```{r}
+plot(ggeffect(modele_retenu, "glucose"))
+```
+
+
+<center> <h1>Matrice de confusion</h1> </center>
+
+
+```{r}
+heart_pred <- predict(modele_retenu, type = "response", newdata = df_heart)
+table(heart_pred > 0.5, df_heart$estMalade10)
+```
+
+Nous avons donc 530 (512+18) prédictions incorrectes sur un total de 3656, soit un taux de mauvais classement de 14,4 %.
+
+
+TEST AVEC LES BASES TRAIN ET TEST
+
+
+```{r}
+model_sature <- glm(estMalade10~. , data = dfApprentissage1, family = binomial)
+summary(model_sature)
+```
+
+
+```{r}
+stepAIC(model_sature)
+```
+
+
+
+```{r}
+modele_retenu <- glm(formula = estMalade10 ~ Sexe + age + NbCigarrete_Jour + TauxChol + 
+    sysTA + BPM + glucose, family = binomial, data = dfApprentissage1)
+print(modele_retenu)
+```
+
+
+```{r}
+heart_pred <- predict(modele_retenu, type = "response", newdata = dftest1)
+table(heart_pred > 0.5, dftest1$estMalade10)
+```
+
+
+Nous avons donc 180 (176+4) prédictions incorrectes sur un total de 1230, soit un taux de mauvais classement de 14.6 %.
+
+
+
+
+<center> <h1>Étude des varibles les plus influentes</h1> </center>
+
+
+
+
+```{r}
+exp(cbind(coef(modele_retenu), confint(modele_retenu)))
+```
+
+
+```{r}
+forest_model(modele_retenu)
+```
+
 
 ```{r}
 plot(ggeffect(modele_retenu, "Sexe"))
@@ -413,119 +510,540 @@ plot(ggeffect(modele_retenu, "sysTA"))
 ```{r}
 plot(ggeffect(modele_retenu, "glucose"))
 ```
+
+
+
+
+
+
+
+
+<center> <h1>Courbe de ROC</h1> </center>
+
+Courbe ROC : Receiver Operating Characteristic Curve, en français "Courbe caractéristique de fonctionnement du récepteur", à l'origine elle a été créée pour établir des signaux radios.
+
+```{r}
+pred <- prediction(heart_pred, dftest1$estMalade10)
+perf <- performance(pred, "tpr", "fpr")
+plot(perf)
+```
+
+
+```{r}
+
+# Analyse des résidus
+res_dev <- residuals(modele_retenu) #residus de deviance
+res_pear <- residuals(modele_retenu, type = 'pearson') #residus de Pearson
+res_dev_stand <- rstandard(modele_retenu) #residu de deviance standardises
+H <- influence(modele_retenu)$hat #diagonale de la hat matrix
+res_pear_stand <- res_pear/sqrt(1-H) #residu de Pearson standardises
+plot(rstudent(modele_retenu), type = 'p', cex=0.5, ylab = 'Résidus studentisés par VC')
+abline(h=c(-2,2))
+```
+
+
+Pour le modèle logistique les résidus de déviance sont souvent préférés. De nombreuses études expérimentales ont montré qu’ils approchent mieux la loi normale que les résidus de Pearson. Pour cette raison ces résidus prennent généralement des valeurs qui varient entre -2et 2.
+Nous pourrons construire un index plot pour détecter des valeurs aberrantes. Ce graphique
+ordonne les résidus en fonction du numéro de leur observation. Les points pour lesquels on observe
+on résidu élevé (hors de [−2, 2] par exemple) devront faire l’objet d’une étude approfondie.
+
+Dans notre cas, nous n'avons pas d'individus en-dessous de -2. Cependant, nous en avons au-dessus de 2.
+
+
+<center> <h1>Distance de Cook</h1> </center>
+
+
+
+Les points influents sont des points qui influent sur le modèle de telle sorte que si on les enlève, alors
+l’estimation des coefficients sera fortement changée. La mesure la plus classique d’influence est la
+distance de Cook. Il s’agit d’une distance entre le coefficient estimé avec toutes les observations et
+celui estimé avec toutes les observations sauf une.
+
+Si une distance se révèle grande par rapport aux autres, alors ce point sera considéré comme influent. Il convient alors de comprendre pourquoi il est influent. 
+
+
+```{r}
+infIndexPlot(modele_retenu, vars = 'Cook', id = TRUE, grid = TRUE, main = 'Les points influents')
+```
+
+
+Nous pouvons enlever l'individu 3972.
+
+
+
+
+
 Cela nous a permis d'avoir un point de départ.
 
 Pour la suite de notre travail, nous avons choisi de prendre parti sur l'hypothèse suivante :
 
-  - L'objectif de notre projet est la détection de malades, étant donné que le nombre de malade est relativement petit 557 individus (15% pour de notre base), nous avons décidé de travailler sur une base d'apprentissage ayant 50% d'individus malade. Ainsi nos modèles seront meilleurs pour la détection de malade.
+La variable la plus significative est celle du sexe.
+Donc à partir de maintenant nous allons créer 2 modèles, le premier pour les hommes et le second pour les femmes.
 
-Les résultats suivants seront donc présentés avec les conditions énoncées précédemment.
+
+
+<center> <h1>Régression logistique modèle Femme</h1> </center>
+
+
+Nous allons donc continuer par faire notre modèle de régression logistique sur les femmes, par pur galanterie.
 
 ```{r}
-model_sature_Appren <- glm(estMalade10~. , data = dfApprentissage, family = binomial)
-summary(model_sature_Appren)
+modelSatureFemme <- glm(estMalade10~. , data = dfApprenFemme, family = binomial)
+summary(modelSatureFemme)
+```
+
+
+La première analyse que nous pouvons avec cette régression est que certaines des variables obtenues ont des p-valeurs qui sont inférieures au niveau de test de 5 %, ce qui nous indique qu'elles sont bien significatives. Certaines autres ne sont pas en dessous de ce seuil. Nous pouvons en lister 5.
+
+On peut donc passer sur une procédure de sélection en retirant les variables non significatives au fur et à mesure, mais nous pouvons aussi sélectionner automatiquement un modèle avec une commande telle que stepAIC  , qui sélectionne de manière automatique un modèle en se basant sur le critère AIC.
+
+
+```{r}
+stepAIC(modelSatureFemme)
 ```
 
 
 
+
+
+La fonction stepAIC nous donne le modèle avec l'AIC le plus faible qui est le suivant :
+
 ```{r}
-stepAIC(model_sature_Appren)
+modelRetenuFemme <- glm(formula = estMalade10 ~ age + NbCigarrete_Jour + AVC + sysTA + 
+    BPM + glucose, family = binomial, data = dfApprenFemme)
+print(modelRetenuFemme)
 ```
 
 
+```{r}
+var_label(dfApprenFemme$estMalade10) <- 'Maladie dans les 10 Ans ?'
+var_label(dfApprenFemme$NbCigarrete_Jour) <- 'Nombre de cigarette par jour'
+var_label(dfApprenFemme$AVC) <- 'AVC'
+var_label(dfApprenFemme$sysTA) <- 'Tension Artérielle Systolique'
+var_label(dfApprenFemme$BPM) <- 'Fréquence Cardiaque'
+var_label(dfApprenFemme$glucose) <- 'Taux de glucose'
+```
+
+Tout d'abord, nous pouvons observer que la fonction stepAIC a sélectionné 6 variables :
+
+  - L'âge ;
+  - Le nombre de cigarrette par jour ;
+  - Si l'individu a eu un AVC ;
+  - La tension artérielle systolique ;
+  - La fréquence cardiaque ;
+  - Et le taux de glucose.
+
+
+Avec ce modèle nous avons un AIC de 891. 
+
+
+Interprétation :
+
+Nous avons donc un AIC de 891.
+Une déviance de  877.
+
+
+<center> <h1>Étude des varibles les plus influentes</h1> </center>
+
 
 ```{r}
-modele_Appren <- glm(formula = estMalade10 ~ Sexe + age + education + NbCigarrete_Jour + sysTA, family = binomial, data = dfApprentissage)
-
-modele_Appren
+exp(cbind(coef(modelRetenuFemme), confint(modelRetenuFemme)))
 ```
 
 
-Nous pouvons observer que la fonction stepAIC a sélectionné 5 variables.
-Sexe
-age
-education
-NbCigarrete_Jour
-sysTA
-
 ```{r}
-modele_Appren$aic
-modele_Appren$deviance
+forest_model(modelRetenuFemme)
 ```
 
 
-Nous avons un bien meilleur AIC, 871.2 et une déviance de 859.
+```{r}
+plot(ggeffect(modelRetenuFemme, "age"))
+```
 
-Passons maintenant à une analyse plus appronfondie.
 
+```{r}
+plot(ggeffect(modelRetenuFemme, "NbCigarrete_Jour"))
+```
+
+```{r}
+plot(ggeffect(modelRetenuFemme, "AVC"))
+```
+
+```{r}
+plot(ggeffect(modelRetenuFemme, "sysTA"))
+```
+
+```{r}
+plot(ggeffect(modelRetenuFemme, "BPM"))
+```
+
+```{r}
+plot(ggeffect(modelRetenuFemme, "glucose"))
+```
 
 
 <center> <h1>Matrice de confusion</h1> </center>
 
 
-Une manière de tester la qualité d’un modèle est le calcul d’une matrice de confusion, c’est-à-dire le tableau croisé des valeurs observées et celles des valeurs prédites en appliquant le modèle aux données d’origine.
+```{r}
+PredFemme <- predict(modelRetenuFemme, type = "response", newdata = dfTestFemme)
+table(PredFemme > 0.5, dfTestFemme$estMalade10)
+```
 
-La méthode predict avec l’argument type="response" permet d’appliquer notre modèle logistique à un tableau de données et renvoie pour chaque individu la probabilité qu’il ait vécu le phénomène étudié.
+Nous avons donc 85 (82+3) prédictions incorrectes sur un total de 680, soit un taux de mauvais classement de 12.5 %.
 
 
 
-```{r Matrice de confusion}
-malade_pred <- predict(modele_Appren, newdata = dfApprentissage, type = "response")
-table(malade_pred > 0.5 , dfApprentissage$estMalade10)
+<center> <h1>Courbe de ROC</h1> </center>
 
-pourcentage <- table(malade_pred > 0.5 , dfApprentissage$estMalade10)
 
-#Calcul pour le pourcentage
-pourcentage <- as.data.frame(pourcentage)
-round((pourcentage$Freq[1]+pourcentage$Freq[4])/sum(pourcentage$Freq),4)
+
+```{r}
+predFemmme <- prediction(PredFemme, dfTestFemme$estMalade10)
+perfFemme <- performance(predFemmme, "tpr", "fpr")
+plot(perfFemme)
+```
+
+
+```{r}
+
+# Analyse des résidus
+res_dev <- residuals(modelRetenuFemme) #residus de deviance
+res_pear <- residuals(modelRetenuFemme, type = 'pearson') #residus de Pearson
+res_dev_stand <- rstandard(modelRetenuFemme) #residu de deviance standardises
+H <- influence(modelRetenuFemme)$hat #diagonale de la hat matrix
+res_pear_stand <- res_pear/sqrt(1-H) #residu de Pearson standardises
+plot(rstudent(modelRetenuFemme), type = 'p', cex=0.5, ylab = 'Résidus studentisés par VC')
+abline(h=c(-2,2))
+```
+
+
+Dans notre cas, nous n'avons pas d'individus en-dessous de -2. Cependant, nous en avons au-dessus de 2.
+Nous allons regarder si des individus sont influents afin de les retirer.
+
+
+<center> <h1>Distance de Cook</h1> </center>
+
+
+Les points influents sont des points qui influent sur le modèle de telle sorte que si on les enlève, alors
+l’estimation des coefficients sera fortement changée. La mesure la plus classique d’influence est la
+distance de Cook. Il s’agit d’une distance entre le coefficient estimé avec toutes les observations et
+celui estimé avec toutes les observations sauf une.
+
+Si une distance se révèle grande par rapport aux autres, alors ce point sera considéré comme influent. Il convient alors de comprendre pourquoi il est influent. 
+
+
+```{r}
+infIndexPlot(modelRetenuFemme, vars = 'Cook', id = TRUE, grid = TRUE, main = 'Les points influents')
+```
+
+
+Nous pourons recommencer l'expérience en retirant ces 2 individus (1167 et 1890).
+
+
+```{r}
+dfApprenFemme <- dfApprenFemme %>% filter(glucose != 386 & sysTA != 194.0)
+```
+
+
+
+```{r}
+modelSatureFemme <- glm(estMalade10~. , data = dfApprenFemme, family = binomial)
+summary(modelSatureFemme)
+```
+
+
+La première analyse que nous pouvons avec cette régression est que certaines des variables obtenues ont des p-valeurs qui sont inférieures au niveau de test de 5 %, ce qui nous indique qu'elles sont bien significatives. Certaines autres ne sont pas en dessous de ce seuil. Nous pouvons en lister 6. (age, NbCigarrete_Jour, AVC, sysTA, BPM, glucosel)
+
+On peut donc passer sur une procédure de sélection en retirant les variables non significatives au fur et à mesure, mais nous pouvons aussi sélectionner automatiquement un modèle avec une commande telle que stepAIC  , qui sélectionne de manière automatique un modèle en se basant sur le critère AIC.
+
+
+```{r}
+stepAIC(modelSatureFemme)
+```
+
+
+La fonction stepAIC et la fonction nous donne le modèle avec l'AIC le plus faible qui est le suivant :
+
+```{r}
+modelRetenuFemme <- glm(formula = estMalade10 ~ age + NbCigarrete_Jour + AVC + sysTA + 
+    BPM + glucose, family = binomial, data = dfApprenFemme)
+print(modelRetenuFemme)
+```
+
+Tout d'abord, nous pouvons observer que la fonction stepAIC a sélectionné 6 variables :
+
+  - L'âge ;
+  - Le nombre de cigarrette par jour ;
+  - La Tension Artérielle Systolique
+  - Si l'individu a eu un AVC;
+  - La fréquence cardiaque ;
+  - Et le taux de glucose.
+
+
+Interprétation :
+
+Nous avons donc un AIC de 886,3 vs 891.
+Une déviance de  872,3. vs 877.
+
+Ce qui est quelque peu mieux qu'avec les 2 indivivus que nous venons de retirer.
+
+
+<center> <h1>Matrice de confusion</h1> </center>
+
+
+```{r}
+PredFemme <- predict(modelRetenuFemme, type = "response", newdata = dfTestFemme)
+table(PredFemme > 0.5, dfTestFemme$estMalade10)
+```
+
+Nous avons donc 85 (82+3) prédictions incorrectes sur un total de 680, soit un taux de mauvais classement de 12.5 %.
+
+Nous retrouvons la même chose.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<center> <h1>Régression logistique modèle Homme</h1> </center>
+
+
+Nous allons donc continuer avec le modèle de régression logistique des hommes.
+
+```{r}
+modelSatureHomme <- glm(estMalade10~. , data = dfApprenHomme, family = binomial)
+summary(modelSatureHomme)
+```
+
+
+La première analyse que nous pouvons avec cette régression est que certaines des variables obtenues ont des p-valeurs qui sont inférieures au niveau de test de 5 %, ce qui nous indique qu'elles sont bien significatives. Certaines autres ne sont pas en dessous de ce seuil. Nous pouvons en lister 3. (age, 
+sysTA, TauxChol)
+
+On peut donc passer sur une procédure de sélection en retirant les variables non significatives au fur et à mesure, mais nous pouvons aussi sélectionner automatiquement un modèle avec une commande telle que stepAIC  , qui sélectionne de manière automatique un modèle en se basant sur le critère AIC.
+
+
+```{r}
+stepAIC(modelSatureHomme)
+```
+
+
+La fonction stepAIC et la fonction nous donne le modèle avec l'AIC le plus faible qui est le suivant :
+
+```{r}
+modelRetenuHomme <- glm(formula = estMalade10 ~ age + Fumeur + TauxChol + sysTA + 
+    glucose, family = binomial, data = dfApprenHomme)
+print(modelRetenuHomme)
+```
+
+
+```{r}
+var_label(dfApprenHomme$estMalade10) <- 'Maladie dans les 10 Ans ?'
+var_label(dfApprenHomme$age) <- 'Age'
+var_label(dfApprenHomme$Fumeur) <- 'Fumeur'
+var_label(dfApprenHomme$sysTA) <- 'Tension Artérielle Systolique'
+var_label(dfApprenHomme$TauxChol) <- 'Taux de cholestérol'
+var_label(dfApprenHomme$glucose) <- 'Taux de glucose'
+```
+
+Tout d'abord, nous pouvons observer que la fonction stepAIC a sélectionné 5 variables :
+
+  - L'âge ;
+  - La tension artérielle systolique ;
+  - Si l'individu est fumeur ;
+  - Le  taux de cholestérol ;
+  - Et le taux de glucose.
+
+
+Interprétation :
+
+Nous avons donc un AIC de 941.
+Une déviance de  929.3
+
+
+<center> <h1>Étude des varibles les plus influentes</h1> </center>
+
+
+```{r}
+exp(cbind(coef(modelRetenuHomme), confint(modelRetenuHomme)))
+```
+
+
+```{r}
+forest_model(modelRetenuHomme)
+```
+
+
+```{r}
+plot(ggeffect(modelRetenuHomme, "age"))
+```
+
+
+```{r}
+plot(ggeffect(modelRetenuHomme, "Fumeur"))
 ```
 
 ```{r}
-appren.p <- cbind(dfApprentissage, predict(modele_retenu, newdata = dfApprentissage,
-                                           type = "response")
-                  )
-appren.p <- within(appren.p, {
-  PredictedWin <- plogis(fit)
-  LL <- plogis(fit - (1.96 * se.fit))
-  UL <- plogis(fit + (1.96 * se.fit))
-})
-appren.p <- cbind(appren.p, pred.chd = factor(ifelse(appren.p$PredictedWin > 0.5, 1, 0)))
-pourcentage <- (m.confusion <- as.matrix(table(appren.p$pred.chd, appren.p$estMalade10)))
-pourcentage
+plot(ggeffect(modelRetenuHomme, "TauxChol"))
+```
+
+```{r}
+plot(ggeffect(modelRetenuHomme, "sysTA"))
+```
+
+```{r}
+plot(ggeffect(modelRetenuHomme, "glucose"))
+```
+
+
+<center> <h1>Matrice de confusion</h1> </center>
+
+
+```{r}
+PredHomme <- predict(modelRetenuHomme, type = "response", newdata = dfTestHomme)
+table(PredHomme > 0.5, dfTestHomme$estMalade10)
+```
+
+Nous avons donc 104 (91+13) prédictions incorrectes sur un total de 544, soit un taux de mauvais classement de 19.1 %.
+
+
+
+<center> <h1>Courbe de ROC</h1> </center>
+
+
+
+```{r}
+ROCHommme <- prediction(PredHomme, dfTestHomme$estMalade10)
+perfHomme <- performance(ROCHommme, "tpr", "fpr")
+plot(perfHomme)
+```
+
+
+```{r}
+# Analyse des résidus
+res_dev <- residuals(modelRetenuHomme) #residus de deviance
+res_pear <- residuals(modelRetenuHomme, type = 'pearson') #residus de Pearson
+res_dev_stand <- rstandard(modelRetenuHomme) #residu de deviance standardises
+H <- influence(modelRetenuHomme)$hat #diagonale de la hat matrix
+res_pear_stand <- res_pear/sqrt(1-H) #residu de Pearson standardises
+plot(rstudent(modelRetenuHomme), type = 'p', cex=0.5, ylab = 'Résidus studentisés par VC')
+abline(h=c(-2,2))
+```
+
+
+Dans notre cas, nous n'avons pas d'individus en-dessous de -2. Cependant, nous en avons au-dessus de 2.
+Nous allons regarder si des individus sont influents afin de les retirer.
+
+
+<center> <h1>Distance de Cook</h1> </center>
+
+
+Les points influents sont des points qui influent sur le modèle de telle sorte que si on les enlève, alors
+l’estimation des coefficients sera fortement changée. La mesure la plus classique d’influence est la
+distance de Cook. Il s’agit d’une distance entre le coefficient estimé avec toutes les observations et
+celui estimé avec toutes les observations sauf une.
+
+Si une distance se révèle grande par rapport aux autres, alors ce point sera considéré comme influent. Il convient alors de comprendre pourquoi il est influent. 
+
+
+```{r}
+infIndexPlot(modelRetenuHomme, vars = 'Cook', id = TRUE, grid = TRUE, main = 'Les points influents')
+```
+
+
+Nous pourons recommencer l'expérience en retirant l'individus 1503.
+
+
+```{r}
+dfApprenHomme <- dfApprenHomme %>% filter(glucose != 370)
 ```
 
 
 
-
-#Calcul pourcentage
-pourcentage <- as.data.frame(pourcentage)
-round((pourcentage$Freq[1]+pourcentage$Freq[4])/sum(pourcentage$Freq),4)
-
-
-# Courbe ROC
-# install.packages("ROCR")
-
-pred <- prediction(appren.p$PredictedWin, appren.p$estMalade10)
-perf <- performance(pred, "tpr", "fpr")
-plot(perf)
-
-# Analyse des rÃ©sidus
-res_dev <- residuals(modele.retenu) #residus de deviance
-res_pear <- residuals(modele.retenu,type="pearson") #residus de Pearson
-res_dev_stand <- rstandard(modele.retenu) #residu de deviance standardises
-H <- influence(modele.retenu)$hat #diagonale de la hat matrix
-res_pear_stand <- res_pear/sqrt(1-H) #residu de Pearson standardises
-plot(rstudent(modele.retenu),type="p",cex=0.5,ylab="Residus studentises par VC")
-abline(h=c(-2,2))
-
-# Prévision
-plot(predict(modele.retenu),rstudent(modele.retenu),type="p",cex=0.5,xlab="prévision linéaire",
-     ylab="Résidus studentisés par VC")
-
-# Distance de cook
-plot(cooks.distance(modele.retenu),type="h",ylab="Distance de Cook")
+```{r}
+modelSatureHomme <- glm(estMalade10~. , data = dfApprenHomme, family = binomial)
+summary(modelSatureHomme)
+```
 
 
+La première analyse que nous pouvons avec cette régression est que certaines des variables obtenues ont des p-valeurs qui sont inférieures au niveau de test de 5 %, ce qui nous indique qu'elles sont bien significatives. Certaines autres ne sont pas en dessous de ce seuil. Nous pouvons en lister 3. (age, 
+sysTA, TauxChol)
+
+On peut donc passer sur une procédure de sélection en retirant les variables non significatives au fur et à mesure, mais nous pouvons aussi sélectionner automatiquement un modèle avec une commande telle que stepAIC  , qui sélectionne de manière automatique un modèle en se basant sur le critère AIC.
 
 
+```{r}
+stepAIC(modelSatureHomme)
+```
 
+
+La fonction stepAIC et la fonction nous donne le modèle avec l'AIC le plus faible qui est le suivant :
+
+```{r}
+modelRetenuHomme <- glm(formula = estMalade10 ~ age + Fumeur + TauxChol + sysTA + 
+    glucose, family = binomial, data = dfApprenHomme)
+print(modelRetenuHomme)
+```
+
+Tout d'abord, nous pouvons observer que la fonction stepAIC a sélectionné 5 variables :
+
+  - L'âge ;
+  - La tension artérielle systolique ;
+  - Si l'individu est fumeur ;
+  - Le  taux de cholestérol ;
+  - Et le taux de glucose.
+
+
+Interprétation :
+
+Nous avons donc un AIC de 941.
+Une déviance de  929.3
+
+
+<center> <h1>Matrice de confusion</h1> </center>
+
+
+```{r}
+PredHomme <- predict(modelRetenuHomme, type = "response", newdata = dfTestHomme)
+table(PredHomme > 0.5, dfTestHomme$estMalade10)
+```
+
+Nous avons donc 104 (91+13) prédictions incorrectes sur un total de 544, soit un taux de mauvais classement de 19.1 %.
+
+Nous retrouvons la même chose.
+
+Il est probable que cela soit dû à un manque de donnée sur les hommes.
