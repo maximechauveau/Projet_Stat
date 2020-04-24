@@ -2,6 +2,13 @@
 .Rhistory
 .RData
 .Ruserdata
+modele_47-55.R
+modele_base.R
+modele_femme.R
+modele_homme.R
+modele_inf47.R
+projet_cardio1.R
+projet_cardio2.R
 
 df_Loisir.csv
 test_RCAD.R
