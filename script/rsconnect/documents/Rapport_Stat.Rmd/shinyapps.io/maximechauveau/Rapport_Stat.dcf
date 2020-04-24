@@ -1,0 +1,12 @@
+name: Rapport_Stat
+title: Rapport_Stat
+username:
+account: maximechauveau
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2179111
+bundleId: 3059918
+url: https://maximechauveau.shinyapps.io/Rapport_Stat/
+when: 1587738464.82463
+asMultiple: FALSE
+asStatic: FALSE

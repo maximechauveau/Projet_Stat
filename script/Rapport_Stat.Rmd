@@ -70,7 +70,7 @@ pacman::p_load('MASS')
 pacman::p_load('questionr')
 
 # pour fonction sample.split
-pacman::p_load('caTools')
+#pacman::p_load('caTools')
 
 pacman::p_load('knitr')
 
@@ -131,8 +131,8 @@ Notre base comporte 3656 patients, dans laquelle 15 % des patients ont eu une ma
 ```{r}
 
 fig <- plot_ly(alpha = 0.6)
-fig <- fig %>% add_histogram(x = df_heart$BPM[df_heart$estMalade10 == 0], name = 'Pas malade')
-fig <- fig %>% add_histogram(x = df_heart$BPM[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% add_histogram(x = df_heart$BPMLabels[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$BPMLabels[df_heart$estMalade10 == 1], name = 'Malade')
 fig <- fig %>% layout(barmode = "overlay")
 
 fig
@@ -175,8 +175,8 @@ fig
 ```{r Analyse par NbCigarrette_Jour faire des classes}
 
 fig <- plot_ly(alpha = 0.6)
-fig <- fig %>% add_histogram(x = df_heart$NbCigarrete_Jour[df_heart$estMalade10 == 0], name = 'Pas malade')
-fig <- fig %>% add_histogram(x = df_heart$NbCigarrete_Jour[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% add_histogram(x = df_heart$CigaretteLabels[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$CigaretteLabels[df_heart$estMalade10 == 1], name = 'Malade')
 fig <- fig %>% layout(barmode = "overlay")
 
 fig
@@ -225,8 +225,8 @@ fig
 
 ```{r Analyse par TauxChol}
 fig <- plot_ly(alpha = 0.6)
-fig <- fig %>% add_histogram(x = df_heart$TauxChol[df_heart$estMalade10 == 0], name = 'Pas malade')
-fig <- fig %>% add_histogram(x = df_heart$TauxChol[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% add_histogram(x = df_heart$TauxCholLabels[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$TauxCholLabels[df_heart$estMalade10 == 1], name = 'Malade')
 fig <- fig %>% layout(barmode = "overlay")
 
 fig
@@ -235,8 +235,8 @@ fig
 
 ```{r Analyse par sysTA}
 fig <- plot_ly(alpha = 0.6)
-fig <- fig %>% add_histogram(x = df_heart$sysTA[df_heart$estMalade10 == 0], name = 'Pas malade')
-fig <- fig %>% add_histogram(x = df_heart$sysTA[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% add_histogram(x = df_heart$sysTALabels[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$sysTALabels[df_heart$estMalade10 == 1], name = 'Malade')
 fig <- fig %>% layout(barmode = "overlay")
 
 fig
@@ -246,8 +246,8 @@ fig
 
 ```{r Analyse par diaTA}
 fig <- plot_ly(alpha = 0.6)
-fig <- fig %>% add_histogram(x = df_heart$diaTA[df_heart$estMalade10 == 0], name = 'Pas malade')
-fig <- fig %>% add_histogram(x = df_heart$diaTA[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% add_histogram(x = df_heart$diaTALabels[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$diaTALabels[df_heart$estMalade10 == 1], name = 'Malade')
 fig <- fig %>% layout(barmode = "overlay")
 
 fig
@@ -256,8 +256,8 @@ fig
 
 ```{r Analyse par IMC}
 fig <- plot_ly(alpha = 0.6)
-fig <- fig %>% add_histogram(x = df_heart$IMC[df_heart$estMalade10 == 0], name = 'Pas malade')
-fig <- fig %>% add_histogram(x = df_heart$IMC[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% add_histogram(x = df_heart$IMCLabels[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$IMCLabels[df_heart$estMalade10 == 1], name = 'Malade')
 fig <- fig %>% layout(barmode = "overlay")
 
 fig
@@ -266,8 +266,8 @@ fig
 
 ```{r Analyse par BPM}
 fig <- plot_ly(alpha = 0.6)
-fig <- fig %>% add_histogram(x = df_heart$BPM[df_heart$estMalade10 == 0], name = 'Pas malade')
-fig <- fig %>% add_histogram(x = df_heart$BPM[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% add_histogram(x = df_heart$BPMLabels[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$BPMLabels[df_heart$estMalade10 == 1], name = 'Malade')
 fig <- fig %>% layout(barmode = "overlay")
 
 fig
@@ -276,8 +276,8 @@ fig
 
 ```{r Analyse par glucose}
 fig <- plot_ly(alpha = 0.6)
-fig <- fig %>% add_histogram(x = df_heart$glucose[df_heart$estMalade10 == 0], name = 'Pas malade')
-fig <- fig %>% add_histogram(x = df_heart$glucose[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% add_histogram(x = df_heart$glucoseLabels[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$glucoseLabels[df_heart$estMalade10 == 1], name = 'Malade')
 fig <- fig %>% layout(barmode = "overlay")
 
 fig
@@ -285,8 +285,8 @@ fig
 
 ```{r Analyse par age}
 fig <- plot_ly(alpha = 0.6)
-fig <- fig %>% add_histogram(x = df_heart$age[df_heart$estMalade10 == 0], name = 'Pas malade')
-fig <- fig %>% add_histogram(x = df_heart$age[df_heart$estMalade10 == 1], name = 'Malade')
+fig <- fig %>% add_histogram(x = df_heart$agelabel[df_heart$estMalade10 == 0], name = 'Pas malade')
+fig <- fig %>% add_histogram(x = df_heart$agelabel[df_heart$estMalade10 == 1], name = 'Malade')
 fig <- fig %>% layout(barmode = "overlay")
 
 fig
@@ -390,12 +390,13 @@ print(modelRetenuEqui)
 
 
 ```{r}
-var_label(dfApprenFemme$estMalade10) <- 'Maladie dans les 10 Ans ?'
-var_label(dfApprenFemme$NbCigarrete_Jour) <- 'Nombre de cigarette par jour'
-var_label(dfApprenFemme$AVC) <- 'AVC'
-var_label(dfApprenFemme$sysTA) <- 'Tension Artérielle Systolique'
-var_label(dfApprenFemme$BPM) <- 'Fréquence Cardiaque'
-var_label(dfApprenFemme$glucose) <- 'Taux de glucose'
+var_label(dfApprenEqui$estMalade10) <- 'Maladie dans les 10 Ans ?'
+var_label(dfApprenEqui$Sexe) <- 'Nombre de cigarette par jour'
+var_label(dfApprenEqui$CigaretteLabels) <- 'Nombre de cigarette par jour'
+var_label(dfApprenEqui$AVC) <- 'AVC'
+var_label(dfApprenEqui$Hypertension) <- 'Hypertension'
+var_label(dfApprenEqui$agelabel) <- 'classe age'
+var_label(dfApprenEqui$glucoseLabels) <- 'Taux de glucose'
 ```
 
 Tout d'abord, nous pouvons observer que la fonction stepAIC a retenu 8 variables pour le modèle :
@@ -428,24 +429,16 @@ forest_model(modelRetenuEqui)
 
 
 ```{r}
-plot(ggeffect(modelRetenuEqui, "age"))
+plot(ggeffect(modelRetenuEqui, "Sexe"))
 ```
 
 
 ```{r}
-plot(ggeffect(modelRetenuEqui, "NbCigarrete_Jour"))
+plot(ggeffect(modelRetenuEqui, "CigaretteLabels"))
 ```
 
 ```{r}
-plot(ggeffect(modelRetenuEqui, "IMC"))
-```
-
-```{r}
-plot(ggeffect(modelRetenuEqui, "sysTA"))
-```
-
-```{r}
-plot(ggeffect(modelRetenuEqui, "education"))
+plot(ggeffect(modelRetenuEqui, "AVC"))
 ```
 
 ```{r}
@@ -453,11 +446,11 @@ plot(ggeffect(modelRetenuEqui, "Hypertension"))
 ```
 
 ```{r}
-plot(ggeffect(modelRetenuEqui, "Sexe"))
+plot(ggeffect(modelRetenuEqui, "agelabel"))
 ```
 
 ```{r}
-plot(ggeffect(modelRetenuEqui, "glucose"))
+plot(ggeffect(modelRetenuEqui, "glucoseLabels"))
 ```
 
 
@@ -469,9 +462,9 @@ PreEqui <- predict(modelRetenuEqui, type = "response", newdata = dfTestEqui)
 table(PreEqui > 0.5, dfTestEqui$estMalade10)
 ```
 
-Nous avons donc 2341,, (1940+401) prédictions incorrectes sur un total de 3656, soit un bon taux de prédiction de 64.03 %.
+Nous avons donc 2330 (1945+385) prédictions incorrectes sur un total de 3656, soit un bon taux de prédiction de 63.73 %.
 
-Cependant, sur les 557, (156+401) patients qui vont avoir une maladie cardiaque dans les 10 prochaines années, notre modèle en prédit 401 soit un taux de bonne prédiction de 71.99 %.
+Cependant, sur les 557, (172+385) patients qui vont avoir une maladie cardiaque dans les 10 prochaines années, notre modèle en prédit 401 soit un taux de bonne prédiction de 69.12 %.
 
 
 <center> <h1>Courbe de ROC</h1> </center>
@@ -486,7 +479,6 @@ plot(perfEqui)
 
 
 ```{r}
-
 # Analyse des résidus
 res_dev <- residuals(modelRetenuEqui) #residus de deviance
 res_pear <- residuals(modelRetenuEqui, type = 'pearson') #residus de Pearson
@@ -518,67 +510,7 @@ infIndexPlot(modelRetenuEqui, vars = 'Cook', id = TRUE, grid = TRUE, main = 'Les
 ```
 
 
-Nous pourons recommencer l'expérience en retirant ces 2 individus (586 et 656).
-
-
-```{r}
-dfApprenEqui <- dfApprenEqui[-c(709, 813),]
-```
-
-
-
-```{r}
-modelSaturEqui2 <- glm(estMalade10~. , data = dfApprenEqui, family = binomial)
-summary(modelSaturEqui2)
-```
-
-
-La première analyse que nous pouvons avec cette régression est que certaines des variables obtenues ont des p-valeurs qui sont inférieures au niveau de test de 5 %, ce qui nous indique qu'elles sont bien significatives. Certaines autres ne sont pas en dessous de ce seuil. Nous pouvons en lister 3. (age, 
-sysTA, TauxChol)
-
-On peut donc passer sur une procédure de sélection en retirant les variables non significatives au fur et à mesure, mais nous pouvons aussi sélectionner automatiquement un modèle avec une commande telle que stepAIC  , qui sélectionne de manière automatique un modèle en se basant sur le critère AIC.
-
-
-```{r}
-stepAIC(modelSaturEqui2)
-```
-
-
-La fonction stepAIC et la fonction nous donne le modèle avec l'AIC le plus faible qui est le suivant :
-
-```{r}
-modelRetenuEqui2 <- glm(formula = estMalade10 ~ Sexe + Hypertension + diabetes + agelabel + CigaretteLabels + diaTALabels, family = binomial, data = dfApprenEqui)
-print(modelRetenuEqui2)
-```
-
-Tout d'abord, nous pouvons observer que la fonction stepAIC a sélectionné 5 variables :
-
-  - L'âge ;
-  - La tension artérielle systolique ;
-  - Si l'individu est fumeur ;
-  - Le  taux de cholestérol ;
-  - Et le taux de glucose.
-
-
-Interprétation :
-
-Nous avons donc un AIC de 941.
-Une déviance de  929.3
-
-
-<center> <h1>Matrice de confusion</h1> </center>
-
-
-```{r}
-PredEqui2 <- predict(modelRetenuEqui2, type = "response", newdata = dfTestEqui)
-table(PredEqui2 > 0.5, dfTestEqui$estMalade10)
-```
-
-Nous avons donc 2358 (1962+396) prédictions correctes sur un total de 3656, soit un bon taux de prédiction de 64.50 %.
-
-Cependant, sur -557, (161+396) patients qui vont avoir une maladie cardiaque dans les 10 prochaines années, notre modèle en prédit 110 soit un bon taux de prédiction de 71.10 %.
-
-
+Nous n'avons pas d'individus à supprimer.
 
 
 
@@ -637,12 +569,12 @@ print(modelRetenuEquiHomme)
 
 
 ```{r}
-var_label(dfApprenFemme$estMalade10) <- 'Maladie dans les 10 Ans ?'
-var_label(dfApprenFemme$NbCigarrete_Jour) <- 'Nombre de cigarette par jour'
-var_label(dfApprenFemme$AVC) <- 'AVC'
-var_label(dfApprenFemme$sysTA) <- 'Tension Artérielle Systolique'
-var_label(dfApprenFemme$BPM) <- 'Fréquence Cardiaque'
-var_label(dfApprenFemme$glucose) <- 'Taux de glucose'
+var_label(dfApprenEquiHomme$estMalade10) <- 'Maladie dans les 10 Ans ?'
+var_label(dfApprenEquiHomme$diabetes) <- 'Diabetique'
+var_label(dfApprenEquiHomme$agelabel) <- 'classe age'
+var_label(dfApprenEquiHomme$CigaretteLabels) <- 'Classe cigarette fumees'
+var_label(dfApprenEquiHomme$diaTALabels) <- 'Classe Tension Arterielle'
+var_label(dfApprenEquiHomme$TauxCholLabels) <- 'Classe Taux cholesterol'
 ```
 
 Tout d'abord, nous pouvons observer que la fonction stepAIC a retenu 8 variables pour le modèle :
@@ -675,36 +607,24 @@ forest_model(modelRetenuEquiHomme)
 
 
 ```{r}
-plot(ggeffect(modelRetenuEquiHomme, "age"))
+plot(ggeffect(modelRetenuEquiHomme, "diabetes"))
 ```
 
 
 ```{r}
-plot(ggeffect(modelRetenuEquiHomme, "NbCigarrete_Jour"))
+plot(ggeffect(modelRetenuEquiHomme, "agelabel"))
 ```
 
 ```{r}
-plot(ggeffect(modelRetenuEquiHomme, "IMC"))
+plot(ggeffect(modelRetenuEquiHomme, "CigaretteLabels"))
 ```
 
 ```{r}
-plot(ggeffect(modelRetenuEquiHomme, "sysTA"))
+plot(ggeffect(modelRetenuEquiHomme, "diaTALabels"))
 ```
 
 ```{r}
-plot(ggeffect(modelRetenuEquiHomme, "education"))
-```
-
-```{r}
-plot(ggeffect(modelRetenuEquiHomme, "Hypertension"))
-```
-
-```{r}
-plot(ggeffect(modelRetenuEquiHomme, "Sexe"))
-```
-
-```{r}
-plot(ggeffect(modelRetenuEquiHomme, "glucose"))
+plot(ggeffect(modelRetenuEquiHomme, "TauxCholLabels"))
 ```
 
 
@@ -883,12 +803,12 @@ print(modelRetenuEquiFemme)
 
 
 ```{r}
-var_label(dfApprenFemme$estMalade10) <- 'Maladie dans les 10 Ans ?'
-var_label(dfApprenFemme$NbCigarrete_Jour) <- 'Nombre de cigarette par jour'
-var_label(dfApprenFemme$AVC) <- 'AVC'
-var_label(dfApprenFemme$sysTA) <- 'Tension Artérielle Systolique'
-var_label(dfApprenFemme$BPM) <- 'Fréquence Cardiaque'
-var_label(dfApprenFemme$glucose) <- 'Taux de glucose'
+var_label(dfApprenEquiFemme$estMalade10) <- 'Maladie dans les 10 Ans ?'
+var_label(dfApprenEquiFemme$AVC) <- 'AVC'
+var_label(dfApprenEquiFemme$Hypertension) <- 'Hypertension'
+var_label(dfApprenEquiFemme$agelabel) <- 'Classe age'
+var_label(dfApprenEquiFemme$CigaretteLabels) <- 'Nombre de cigarette par jour'
+var_label(dfApprenEquiFemme$BPMLabels) <- 'classe frequence cardiaque'
 ```
 
 Tout d'abord, nous pouvons observer que la fonction stepAIC a retenu 8 variables pour le modèle :
@@ -921,36 +841,24 @@ forest_model(modelRetenuEquiFemme)
 
 
 ```{r}
-plot(ggeffect(modelRetenuEquiFemme, "age"))
+plot(ggeffect(modelRetenuEquiFemme, "AVC"))
 ```
 
-
-```{r}
-plot(ggeffect(modelRetenuEquiFemme, "NbCigarrete_Jour"))
-```
-
-```{r}
-plot(ggeffect(modelRetenuEquiFemme, "IMC"))
-```
-
-```{r}
-plot(ggeffect(modelRetenuEquiFemme, "sysTA"))
-```
-
-```{r}
-plot(ggeffect(modelRetenuEquiFemme, "education"))
-```
 
 ```{r}
 plot(ggeffect(modelRetenuEquiFemme, "Hypertension"))
 ```
 
 ```{r}
-plot(ggeffect(modelRetenuEquiFemme, "Sexe"))
+plot(ggeffect(modelRetenuEquiFemme, "agelabel"))
 ```
 
 ```{r}
-plot(ggeffect(modelRetenuEquiFemme, "glucose"))
+plot(ggeffect(modelRetenuEquiFemme, "CigaretteLabels"))
+```
+
+```{r}
+plot(ggeffect(modelRetenuEquiFemme, "BPMLabels"))
 ```
 
 
@@ -1010,63 +918,3 @@ Si une distance se révèle grande par rapport aux autres, alors ce point sera c
 infIndexPlot(modelRetenuEquiFemme, vars = 'Cook', id = TRUE, grid = TRUE, main = 'Les points influents')
 ```
 
-
-Nous pourons recommencer l'expérience en retirant ces 2 individus (429 et 462).
-
-
-```{r}
-dfApprenEquiFemme <- dfApprenEquiFemme[-c(429, 462),]
-```
-
-
-
-```{r}
-modelSaturEquiFemme2 <- glm(estMalade10~. , data = dfApprenEquiFemme, family = binomial)
-summary(modelSaturEquiFemme2)
-```
-
-
-La première analyse que nous pouvons avec cette régression est que certaines des variables obtenues ont des p-valeurs qui sont inférieures au niveau de test de 5 %, ce qui nous indique qu'elles sont bien significatives. Certaines autres ne sont pas en dessous de ce seuil. Nous pouvons en lister 3. (age, 
-sysTA, TauxChol)
-
-On peut donc passer sur une procédure de sélection en retirant les variables non significatives au fur et à mesure, mais nous pouvons aussi sélectionner automatiquement un modèle avec une commande telle que stepAIC  , qui sélectionne de manière automatique un modèle en se basant sur le critère AIC.
-
-
-```{r}
-stepAIC(modelSaturEquiFemme2)
-```
-
-
-La fonction stepAIC et la fonction nous donne le modèle avec l'AIC le plus faible qui est le suivant :
-
-```{r}
-modelRetenuEquiFemme2 <- glm(formula = estMalade10 ~ age + NbCigarrete_Jour + Hypertension + sysTA + glucose, family = binomial, data = dfApprenEquiFemme)
-print(modelRetenuEquiFemme2)
-```
-
-Tout d'abord, nous pouvons observer que la fonction stepAIC a sélectionné 5 variables :
-
-  - L'âge ;
-  - La tension artérielle systolique ;
-  - Si l'individu est fumeur ;
-  - Le  taux de cholestérol ;
-  - Et le taux de glucose.
-
-
-Interprétation :
-
-Nous avons donc un AIC de 941.
-Une déviance de  929.3
-
-
-<center> <h1>Matrice de confusion</h1> </center>
-
-
-```{r}
-PredEquiFemme2 <- predict(modelRetenuEquiFemme2, type = "response", newdata = dfTestEquiFemme)
-table(PredEquiFemme2 > 0.5, dfTestEquiFemme$estMalade10)
-```
-
-Nous avons donc 1378, (1216+162) prédictions correctes sur un total de 2034, soit un bon taux de prédiction de 67.75 %.
-
-Cependant, sur 250 patients qui vont avoir une maladie cardiaque dans les 10 prochaines années, notre modèle en prédit 162 soit un taux de bonne prédiction de 64.8,0 %.
