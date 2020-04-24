@@ -1,7 +1,7 @@
 ####################################
 ### 1 - Importation des packages ###
 ####################################
-
+install.packages('pacman')
 pacman::p_load('pacman')
 
 pacman::p_load('tidyr')

@@ -54,8 +54,8 @@ runtime: shiny
 \n<br />
 
 ```{r setup, include=FALSE}
-#install.packages('pacman')
-
+install.packages('pacman')
+pacman::p_load('pacman')
 pacman::p_load('tidyr')
 pacman::p_load('dplyr')
 
@@ -95,7 +95,8 @@ pacman::p_load('car')
 
 
 ```{r chargement des données}
-load(file='C:/Users/mchauveau/Documents/Maxime Chauveau/Master Medas/Projet_Stat/data/dataClean.RData')
+setwd('C:/Users/mchauveau/Documents/Maxime Chauveau/Master Medas/Projet_Stat/data')
+load(file='./dataClean.RData')
 ```
 
 
@@ -424,7 +425,7 @@ Une déviance de  1338.
 
 
 ```{r}
-forest_model(modelRetenuEqui)
+suppressWarnings(forest_model(modelRetenuEqui))
 ```
 
 
@@ -602,7 +603,7 @@ Une déviance de  1338.
 
 
 ```{r}
-forest_model(modelRetenuEquiHomme)
+suppressWarnings(forest_model(modelRetenuEquiHomme))
 ```
 
 
@@ -836,7 +837,7 @@ Une déviance de  1338.
 
 
 ```{r}
-forest_model(modelRetenuEquiFemme)
+suppressWarnings(forest_model(modelRetenuEquiFemme))
 ```
 
 
